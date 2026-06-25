@@ -39,25 +39,15 @@ class RetrievedChunk:
     payload: dict[str, Any] = field(default_factory=dict)
 
 
-# ✅ FIXED CLIENT
 def get_client() -> QdrantClient:
     global _client
     if _client is None:
-        host = _get_host(_settings.qdrant_url)
-
         _client = QdrantClient(
-            host=host,
-            port=6333,
+            url=_settings.qdrant_url,
             api_key=_settings.qdrant_api_key,
             timeout=30,
+            https=True,
         )
-
-        # ✅ Safe init (prevents crash loop)
-        try:
-            _ensure_collection(_client)
-        except Exception as e:
-            print(f"⚠️ Qdrant init warning: {e}")
-
     return _client
 
 
