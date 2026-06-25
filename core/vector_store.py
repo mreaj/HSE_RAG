@@ -69,7 +69,8 @@ def _ensure_collection(client: QdrantClient) -> None:
         for fld in ("doc_id", "origin", "allowed_principals"):
             try:
                 client.create_payload_index(name, field_name=fld, field_schema="keyword")
-            except Exception:
+            except Exception as e:
+                raise RuntimeError(f"Qdrant not reachable: {e}")
                 pass
 
 
