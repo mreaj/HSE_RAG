@@ -48,7 +48,15 @@ def get_client() -> QdrantClient:
             api_key=_settings.qdrant_api_key,
             timeout=30,
         )
+
+        # ✅ ENSURE collection safely at startup
+        try:
+            _ensure_collection(_client)
+        except Exception as e:
+            print(f"⚠️ Init warning: {e}")
+
     return _client
+
 
 def _ensure_collection(client: QdrantClient) -> None:
     try:
@@ -270,4 +278,6 @@ def health() -> str:
         get_client().get_collections()
         return "healthy"
     except Exception as e:
-        return f"unreachable: {e}"
+        print(f"⚠️ Health check failed: {e}")
+        return "unreachable"
+
