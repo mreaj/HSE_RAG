@@ -56,13 +56,16 @@ def _admin_gate() -> bool:
 
 st.sidebar.title("📚 RAG Console")
 
-from core import auth
+#from core import auth
+#user = auth.require_login()
+#access_set = auth.access_set_for(user)
 
-user = auth.require_login()
-access_set = auth.access_set_for(user)
+# ✅ DEMO MODE (no login)
+user = {"name": "Demo User", "email": "demo@local"}
+access_set = {"*"}   # full access
 
 st.sidebar.write(f"Signed in as **{user.get('name') or user.get('email')}**")
-auth.logout_button()
+#auth.logout_button()
 st.sidebar.divider()
 
 section = st.sidebar.radio("Go to", ["Chat", "Admin"], label_visibility="collapsed")
