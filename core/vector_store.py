@@ -55,9 +55,8 @@ def _ensure_collection(client: QdrantClient) -> None:
         collections = client.get_collections()
         existing = {c.name for c in collections.collections}
     except Exception as e:
-        # ✅ DO NOT crash app
         print(f"⚠️ Qdrant not reachable: {e}")
-        return
+        return   # ✅ DO NOT crash app
 
     name = _settings.qdrant_collection
 
@@ -68,7 +67,7 @@ def _ensure_collection(client: QdrantClient) -> None:
                 vectors_config={
                     DENSE: VectorParams(
                         size=_settings.embedding_dim,
-                        distance=Distance.COSINE,
+                        distance=Distance.COSINE
                     )
                 },
                 sparse_vectors_config={
@@ -84,12 +83,11 @@ def _ensure_collection(client: QdrantClient) -> None:
                         field_schema="keyword"
                     )
                 except Exception:
-                    pass  # ✅ ignore index errors
+                    pass
 
         except Exception as e:
-            print(f"⚠️ Failed to create collection: {e}")
-
-
+            print(f"⚠️ Collection creation failed: {e}")
+                
 # ── UPSERT ─────────────────────────────────────────────────────────
 
 def upsert_chunks(chunks: list[dict], batch: int = 32) -> int:
