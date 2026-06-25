@@ -24,8 +24,14 @@ st.set_page_config(page_title="RAG Console", page_icon="📚", layout="wide")
 
 @st.cache_resource
 def _bootstrap():
-    db.init_db()
-    return True
+    try:
+        db.init_db()
+        return True
+    except Exception as e:
+        import streamlit as st
+        st.error(f"Startup warning: {e}")
+        return False
+``
 
 
 _bootstrap()
