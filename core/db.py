@@ -84,9 +84,13 @@ def _put(point_id: str, payload: dict) -> None:
     )
 
 
-def _get(point_id: str) -> Optional[dict]:
-    res = _client().retrieve(CONFIG_COLLECTION, ids=[point_id], with_payload=True)
-    return dict(res[0].payload) if res else None
+def _get(point_id: str):
+    try:
+        res = _client().retrieve(CONFIG_COLLECTION, ids=[point_id], with_payload=True)
+        return dict(res[0].payload) if res else None
+    except Exception as e:
+        print(f"⚠️ DB retrieve failed: {e}")
+        return None
 
 
 def _delete(point_id: str) -> None:
