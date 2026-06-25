@@ -31,8 +31,6 @@ def _bootstrap():
         import streamlit as st
         st.error(f"Startup warning: {e}")
         return False
-``
-
 
 _bootstrap()
 
