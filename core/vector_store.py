@@ -39,6 +39,7 @@ class RetrievedChunk:
     payload: dict[str, Any] = field(default_factory=dict)
 
 
+
 def get_client() -> QdrantClient:
     global _client
     if _client is None:
@@ -46,45 +47,47 @@ def get_client() -> QdrantClient:
             url=_settings.qdrant_url,
             api_key=_settings.qdrant_api_key,
             timeout=30,
-            https=True,
         )
     return _client
 
-
-# ✅ SAFE COLLECTION CHECK
 def _ensure_collection(client: QdrantClient) -> None:
     try:
         collections = client.get_collections()
         existing = {c.name for c in collections.collections}
     except Exception as e:
-        raise RuntimeError(f"Qdrant not reachable: {e}")
+        # ✅ DO NOT crash app
+        print(f"⚠️ Qdrant not reachable: {e}")
+        return
 
     name = _settings.qdrant_collection
 
     if name not in existing:
-        client.create_collection(
-            collection_name=name,
-            vectors_config={
-                DENSE: VectorParams(
-                    size=_settings.embedding_dim,
-                    distance=Distance.COSINE
-                )
-            },
-            sparse_vectors_config={
-                SPARSE: SparseVectorParams(index=SparseIndexParams())
-            },
-        )
+        try:
+            client.create_collection(
+                collection_name=name,
+                vectors_config={
+                    DENSE: VectorParams(
+                        size=_settings.embedding_dim,
+                        distance=Distance.COSINE,
+                    )
+                },
+                sparse_vectors_config={
+                    SPARSE: SparseVectorParams(index=SparseIndexParams())
+                },
+            )
 
-        # ✅ Create payload indexes
-        for fld in ("doc_id", "origin", "allowed_principals"):
-            try:
-                client.create_payload_index(
-                    name,
-                    field_name=fld,
-                    field_schema="keyword"
-                )
-            except Exception:
-                pass
+            for fld in ("doc_id", "origin", "allowed_principals"):
+                try:
+                    client.create_payload_index(
+                        name,
+                        field_name=fld,
+                        field_schema="keyword"
+                    )
+                except Exception:
+                    pass  # ✅ ignore index errors
+
+        except Exception as e:
+            print(f"⚠️ Failed to create collection: {e}")
 
 
 # ── UPSERT ─────────────────────────────────────────────────────────
