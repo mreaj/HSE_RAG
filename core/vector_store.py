@@ -47,11 +47,11 @@ class RetrievedChunk:
 def get_client() -> QdrantClient:
     global _client
     if _client is None:
-        if _settings.qdrant_api_key:
-            _client = QdrantClient(url=_settings.qdrant_url, api_key=_settings.qdrant_api_key)
-        else:
-            _client = QdrantClient(url=_settings.qdrant_url)
-        _ensure_collection(_client)
+        _client = QdrantClient(
+            url=_settings.qdrant_url,
+            api_key=_settings.qdrant_api_key,
+            timeout=30,
+        )
     return _client
 
 
