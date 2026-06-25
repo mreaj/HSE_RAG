@@ -43,9 +43,9 @@ def get_client() -> QdrantClient:
     if _client is None:
         _client = QdrantClient(
             url=_settings.qdrant_url,
-            api_key=_settings.qdrant_api_key,
+            api_key=_settings.qdrant_api_key or None,
             timeout=30,
-            prefer_grpc=False,     # ✅ IMPORTANT (force HTTP)
+            prefer_grpc=False,   # ✅ VERY IMPORTANT
         )
     return _client
 
