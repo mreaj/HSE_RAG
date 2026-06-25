@@ -51,21 +51,26 @@ def _client():
     return vector_store.get_client()
 
 
-def _ensure_config_collection() -> None:
-    client = _client()
-    existing = {c.name for c in client.get_collections().collections}
-    if CONFIG_COLLECTION not in existing:
-        client.create_collection(
-            collection_name=CONFIG_COLLECTION,
-            vectors_config=VectorParams(size=1, distance=Distance.DOT),
-        )
-        for fld in ("kind", "url", "origin", "origin_id", "doc_id"):
-            try:
-                client.create_payload_index(CONFIG_COLLECTION, field_name=fld,
-                                            field_schema="keyword")
-            except Exception:
-                pass
+def _ensure_config_collection():
+    from core.vector_store import get_client
 
+    client = get_client()
+
+    try:
+        collections = client.get_collections()
+        existing = {c.name for c in collections.collections}
+    except Exception as e:
+        print(f"⚠️ Qdrant DB init failed: {e}")
+        return   # ✅ DO NOT CRASH
+
+    if CONFIG_COLLECTION not in existing:
+        try:
+            client.create_collection(
+                collection_name=CONFIG_COLLECTION,
+                vectors_config={"dense": VectorParams(size=1536, distance=Distance.COSINE)},
+            )
+        except Exception as e:
+            print(f"⚠️ Config collection creation failed: {e}")
 
 def _pid(*parts: str) -> str:
     """Deterministic point id from logical key parts."""
