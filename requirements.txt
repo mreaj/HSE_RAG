@@ -1,0 +1,11 @@
+streamlit>=1.42
+Authlib>=1.3.2
+qdrant-client>=1.9,<2
+fastembed>=0.3
+httpx>=0.27
+python-dotenv>=1.0
+trafilatura>=1.9
+pymupdf>=1.24
+python-docx>=1.1
+msal>=1.28
+openai>=1.40
