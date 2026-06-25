@@ -38,8 +38,6 @@ class RetrievedChunk:
     score: float
     payload: dict[str, Any] = field(default_factory=dict)
 
-
-
 def get_client() -> QdrantClient:
     global _client
     if _client is None:
@@ -47,14 +45,8 @@ def get_client() -> QdrantClient:
             url=_settings.qdrant_url,
             api_key=_settings.qdrant_api_key,
             timeout=30,
+            prefer_grpc=False,     # ✅ IMPORTANT (force HTTP)
         )
-
-        # ✅ ENSURE collection safely at startup
-        try:
-            _ensure_collection(_client)
-        except Exception as e:
-            print(f"⚠️ Init warning: {e}")
-
     return _client
 
 
